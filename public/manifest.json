@@ -1,0 +1,15 @@
+{
+  "name": "TTRPG Owlbear Bridge",
+  "version": "0.1.0",
+  "manifest_version": 1,
+  "description": "Prototype bridge for linking Owlbear tokens to TTRPG character sheets.",
+  "author": "University Final Project",
+  "icon": "/icon.svg",
+  "action": {
+    "title": "TTRPG Bridge",
+    "icon": "/icon.svg",
+    "popover": "/",
+    "width": 420,
+    "height": 640
+  }
+}
