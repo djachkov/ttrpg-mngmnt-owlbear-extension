@@ -61,12 +61,32 @@ export interface CharacterListOut {
 
 export interface GroupCharacterOut {
   id: number
-  group_id: number
+  campaign_id: number
   character_id: number
   user_id: number
   is_active: boolean
   joined_at: string
   character: CharacterListOut
+}
+
+export interface EncounterCombatantOut {
+  id: number
+  name: string
+  kind: 'pc' | 'monster' | 'npc'
+  initiative: number | null
+  hp_current: number | null
+  hp_max: number | null
+  hp_state: string | null
+  conditions: string[]
+  defeated: boolean
+}
+
+export interface ActiveEncounterOut {
+  id: number
+  name: string
+  round: number
+  current_combatant_id: number | null
+  combatants: EncounterCombatantOut[]
 }
 
 export interface CharacterStateOut {
@@ -191,17 +211,23 @@ export class ApiClient {
   }
 
   async getGroups(): Promise<GroupOut[]> {
-    return this.request<GroupOut[]>('/groups', { method: 'GET' })
+    return this.request<GroupOut[]>('/campaigns', { method: 'GET' })
+  }
+
+  async getActiveEncounter(campaignId: number): Promise<ActiveEncounterOut | null> {
+    return this.request<ActiveEncounterOut | null>(`/campaigns/${campaignId}/encounters/active`, {
+      method: 'GET',
+    })
   }
 
   async getGroupCharacters(groupId: number): Promise<GroupCharacterOut[]> {
-    return this.request<GroupCharacterOut[]>(`/groups/${groupId}/characters`, {
+    return this.request<GroupCharacterOut[]>(`/campaigns/${groupId}/characters`, {
       method: 'GET',
     })
   }
 
   async getGroupMembers(groupId: number): Promise<MemberOut[]> {
-    return this.request<MemberOut[]>(`/groups/${groupId}/members`, {
+    return this.request<MemberOut[]>(`/campaigns/${groupId}/members`, {
       method: 'GET',
     })
   }
@@ -230,7 +256,7 @@ export class ApiClient {
   ): Promise<CharacterRollResponse> {
     return this.request<CharacterRollResponse>(this.withGroupQuery(`/characters/${characterId}/roll`, groupId), {
       method: 'POST',
-      body: payload as unknown as Record<string, unknown>,
+      body: { ...payload, ...(groupId !== undefined ? { campaign_id: groupId } : {}) } as unknown as Record<string, unknown>,
     })
   }
 
@@ -335,7 +361,7 @@ export class ApiClient {
     if (groupId === undefined) {
       return path
     }
-    const params = new URLSearchParams({ group_id: String(groupId) })
+    const params = new URLSearchParams({ campaign_id: String(groupId) })
     return `${path}?${params.toString()}`
   }
 

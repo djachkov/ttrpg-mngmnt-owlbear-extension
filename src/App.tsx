@@ -1,6 +1,8 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import OBR, { Item, isImage } from '@owlbear-rodeo/sdk'
 
+import { EncounterPanel } from './EncounterPanel'
+
 import {
   ApiClient,
   ApiError,
@@ -328,7 +330,7 @@ export function App() {
       : groupCharacters.find(
         (assignment) =>
           assignment.character.id === activeTokenLink.characterId &&
-          assignment.group_id === activeTokenLink.groupId,
+          assignment.campaign_id === activeTokenLink.groupId,
       ) ?? null
 
   const linkedGameSystem = linkedCharacterState?.game_system ?? linkedAssignment?.character.game_system ?? null
@@ -1305,6 +1307,10 @@ export function App() {
           <li>Selected items: {selectionIds.length}</li>
         </ul>
       </section>
+
+      {authTokens && selectedGroupId !== null && (
+        <EncounterPanel apiClient={apiClient} campaignId={selectedGroupId} />
+      )}
 
       <section className="card">
         <h2>Backend Auth</h2>
